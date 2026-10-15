@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import SettingsPage from '../../admin/pages/SettingsPage';
+---
+
+<AdminLayout title="Settings">
+  <SettingsPage client:only="react" />
+</AdminLayout>

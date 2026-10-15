@@ -3,6 +3,18 @@ dist/
 .astro/
 .env
 .env.*
+!.env.example
+!.env.emulators
 .DS_Store
 Thumbs.db
 *.log
+
+# Firebase
+.firebase/
+functions/lib/
+functions/.secret.local
+functions/.env.*
+!functions/.env
+emulator-data/
+service-account*.json
+*-firebase-adminsdk-*.json

@@ -1,0 +1,61 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Deploys are skipped until the FIREBASE_SERVICE_ACCOUNT secret is added (see docs/ADMIN_BACKEND_PLAN.md, step C).
+      CAN_DEPLOY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Record build start
+        run: echo "BUILD_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - name: Install
+        run: npm ci
+
+      - name: Build storefront
+        run: npm run build
+        env:
+          CATALOG_SOURCE: ${{ env.CAN_DEPLOY == 'true' && 'firestore' || 'seed' }}
+
+      - name: Authenticate to Google Cloud
+        if: env.CAN_DEPLOY == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Firebase Hosting
+        if: env.CAN_DEPLOY == 'true'
+        run: npx firebase deploy --only hosting --project royaleluxury --non-interactive
+
+      - name: Mark published
+        if: env.CAN_DEPLOY == 'true'
+        run: node scripts/mark-published.mjs
+
+      - name: Mark failed
+        if: failure() && env.CAN_DEPLOY == 'true'
+        run: node scripts/mark-published.mjs --failed || true
+
+      - name: Deploy skipped
+        if: env.CAN_DEPLOY != 'true'
+        run: echo "::notice::Build passed. Deploy skipped because the FIREBASE_SERVICE_ACCOUNT secret is not set yet."

@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import OrdersPage from '../../../admin/pages/OrdersPage';
+---
+
+<AdminLayout title="Orders">
+  <OrdersPage client:only="react" />
+</AdminLayout>

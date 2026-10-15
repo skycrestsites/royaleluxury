@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import TeamPage from '../../admin/pages/TeamPage';
+---
+
+<AdminLayout title="Team">
+  <TeamPage client:only="react" />
+</AdminLayout>

@@ -1,7 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
-import type { ProductImage } from '../data/products';
+import { imageProps, type ProductImage } from '../data/types';
 
 interface Props {
   images: ProductImage[];
@@ -18,7 +18,7 @@ const multiple = images.length > 1;
         images.map((image, i) => (
           <figure class="gallery-slide" aria-label={`Image ${i + 1} of ${images.length}`}>
             <Picture
-              src={image.src}
+              {...imageProps(image)}
               alt={image.alt}
               widths={[480, 720, 960, 1280]}
               sizes="(max-width: 900px) 100vw, 55vw"
@@ -59,7 +59,7 @@ const multiple = images.length > 1;
             aria-current={i === 0 ? 'true' : 'false'}
             data-gallery-thumb={i}
           >
-            <Picture src={image.src} alt="" widths={[160]} sizes="80px" formats={['avif', 'webp']} />
+            <Picture {...imageProps(image)} alt="" widths={[160]} sizes="80px" formats={['avif', 'webp']} />
           </button>
         ))}
       </div>

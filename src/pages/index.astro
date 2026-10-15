@@ -18,6 +18,7 @@ import { getFeaturedProducts, productUrl, products } from '../data/products';
 import { faqs } from '../data/faqs';
 import { formatPrice, site } from '../data/site';
 import { organizationSchema, websiteSchema } from '../data/schema';
+import { imageProps } from '../data/types';
 
 const featured = getFeaturedProducts();
 const spotlight = products[0];
@@ -72,7 +73,7 @@ const reasons: { icon: IconName; title: string; text: string }[] = [
           class="hero-img"
         />
         <a class="hero-card" href={productUrl(spotlight.slug)}>
-          <Picture src={spotlight.images[0].src} alt="" widths={[120]} sizes="60px" formats={['avif', 'webp']} class="hero-card-img" />
+          <Picture {...imageProps(spotlight.images[0])} alt="" widths={[120]} sizes="60px" formats={['avif', 'webp']} class="hero-card-img" />
           <span>
             <span class="hero-card-label">Bestseller</span>
             <span class="hero-card-name">{spotlight.name}</span>
@@ -112,8 +113,8 @@ const reasons: { icon: IconName; title: string; text: string }[] = [
     <div class="container spotlight">
       <div class="spotlight-media">
         <Picture
-          src={spotlight.images[1].src}
-          alt={spotlight.images[1].alt}
+          {...imageProps(spotlight.images[1] ?? spotlight.images[0])}
+          alt={(spotlight.images[1] ?? spotlight.images[0]).alt}
           widths={[480, 720, 960]}
           sizes="(max-width: 900px) 100vw, 50vw"
           formats={['avif', 'webp']}

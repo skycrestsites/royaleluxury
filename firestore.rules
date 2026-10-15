@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return signedIn() ? request.auth.token.get('role', '') : '';
+    }
+
+    function isAdmin() {
+      return role() in ['owner', 'admin'];
+    }
+
+    function isOwner() {
+      return role() == 'owner';
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function onlyChanges(fields) {
+      return incoming().diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function isText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    function isMoney(value) {
+      return (value is int || value is float) && value >= 0 && value <= 100000;
+    }
+
+    function isValidProduct(p) {
+      return p.keys().hasAll(['name', 'slug', 'sku', 'categoryId', 'status', 'price', 'images', 'updatedAt', 'updatedBy'])
+        && isText(p.name, 1, 120)
+        && p.slug is string && p.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$') && p.slug.size() <= 80
+        && isText(p.sku, 1, 40)
+        && isText(p.categoryId, 1, 60)
+        && p.status in ['draft', 'active', 'archived']
+        && isMoney(p.price)
+        && (!p.keys().hasAny(['compareAtPrice']) || p.compareAtPrice == null || isMoney(p.compareAtPrice))
+        && p.images is list && p.images.size() <= 12
+        && p.updatedAt == request.time
+        && p.updatedBy == request.auth.uid;
+    }
+
+    function isValidCategory(c) {
+      return c.keys().hasAll(['name', 'headline', 'summary', 'sortOrder', 'updatedAt'])
+        && isText(c.name, 1, 60)
+        && isText(c.headline, 1, 120)
+        && isText(c.summary, 1, 300)
+        && c.sortOrder is int
+        && c.updatedAt == request.time;
+    }
+
+    // ---------- Catalog ----------
+
+    match /products/{productId} {
+      allow read: if resource.data.status == 'active' || isAdmin();
+      allow create, update: if isAdmin() && isValidProduct(incoming());
+      allow delete: if isOwner();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidCategory(incoming());
+      allow delete: if isOwner();
+    }
+
+    // ---------- Orders (created by the server only) ----------
+
+    match /orders/{orderId} {
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && onlyChanges(['status', 'fulfillment', 'notes', 'updatedAt', 'updatedBy'])
+        && incoming().status in ['pending', 'paid', 'fulfilled', 'shipped', 'delivered', 'cancelled', 'refunded']
+        && incoming().updatedAt == request.time
+        && incoming().updatedBy == request.auth.uid;
+      allow create, delete: if false;
+    }
+
+    // ---------- Team, integrations and system state ----------
+
+    match /admins/{uid} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /invites/{inviteId} {
+      allow read: if isOwner();
+      allow write: if false;
+    }
+
+    match /integrations/{integrationId} {
+      allow read: if isAdmin();
+      allow update: if isOwner() && onlyChanges(['enabled', 'settings', 'updatedAt']);
+      allow create, delete: if false;
+    }
+
+    match /stats/{statId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /site/{docId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

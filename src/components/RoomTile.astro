@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import Icon from './Icon.astro';
 import { categoryUrl, type Category } from '../data/categories';
+import { imageProps } from '../data/types';
 
 interface Props {
   category: Category;
@@ -12,7 +13,7 @@ const { category } = Astro.props;
 
 <a class="room-tile" href={categoryUrl(category.slug)}>
   <Picture
-    src={category.image}
+    {...imageProps(category.image)}
     alt={category.imageAlt}
     widths={[360, 540, 720]}
     sizes="(max-width: 860px) 70vw, 20vw"

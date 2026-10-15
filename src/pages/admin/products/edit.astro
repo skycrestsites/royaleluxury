@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import ProductEditorPage from '../../../admin/pages/ProductEditorPage';
+---
+
+<AdminLayout title="Product">
+  <ProductEditorPage client:only="react" />
+</AdminLayout>

@@ -9,6 +9,7 @@ import CtaBand from '../../components/CtaBand.astro';
 import { categories, categoryUrl, type Category } from '../../data/categories';
 import { getProductsByCategory } from '../../data/products';
 import { breadcrumbSchema } from '../../data/schema';
+import { imageUrl } from '../../data/types';
 
 export function getStaticPaths() {
   return categories.map((category) => ({ params: { slug: category.slug }, props: { category } }));
@@ -31,7 +32,7 @@ const crumbs = [
 <BaseLayout
   title={`${category.name} Essentials`}
   description={category.metaDescription}
-  image={category.image.src}
+  image={imageUrl(category.image)}
   imageAlt={category.imageAlt}
   jsonLd={[breadcrumbSchema(crumbs)]}
 >

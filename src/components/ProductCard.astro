@@ -4,6 +4,7 @@ import Rating from './Rating.astro';
 import { getCategory } from '../data/categories';
 import { productUrl, type Product } from '../data/products';
 import { formatPrice } from '../data/site';
+import { imageProps } from '../data/types';
 
 interface Props {
   product: Product;
@@ -20,7 +21,7 @@ const sizes = '(max-width: 720px) 50vw, (max-width: 1024px) 33vw, 300px';
   <a href={productUrl(product.slug)} class="card-link">
     <div class="card-media">
       <Picture
-        src={primary.src}
+        {...imageProps(primary)}
         alt={primary.alt}
         widths={[320, 480, 640]}
         sizes={sizes}
@@ -31,7 +32,7 @@ const sizes = '(max-width: 720px) 50vw, (max-width: 1024px) 33vw, 300px';
       {
         secondary && (
           <Picture
-            src={secondary.src}
+            {...imageProps(secondary)}
             alt=""
             widths={[320, 480, 640]}
             sizes={sizes}

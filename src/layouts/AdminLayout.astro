@@ -1,0 +1,27 @@
+---
+import '../styles/admin.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#262a33" />
+    <title>{title} | Royale Luxury Admin</title>
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  </head>
+  <body>
+    <slot />
+    <noscript><p class="a-noscript">The admin requires JavaScript.</p></noscript>
+  </body>
+</html>

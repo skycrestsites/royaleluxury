@@ -13,6 +13,7 @@ import { getCategory, categoryUrl } from '../../data/categories';
 import { getSimilarProducts, productUrl, products, type Product } from '../../data/products';
 import { formatPrice, site } from '../../data/site';
 import { breadcrumbSchema, productSchema } from '../../data/schema';
+import { imageProps, imageUrl } from '../../data/types';
 
 export function getStaticPaths() {
   return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
@@ -27,7 +28,7 @@ const category = getCategory(product.category)!;
 const similar = getSimilarProducts(product);
 const url = productUrl(product.slug);
 const savings = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
-const thumbnail = await getImage({ src: product.images[0].src, width: 200, format: 'webp' });
+const thumbnail = await getImage({ ...imageProps(product.images[0]), width: 200, format: 'webp' });
 const shippingThreshold = formatPrice(site.freeShippingThreshold).replace('.00', '');
 
 const crumbs = [
@@ -54,11 +55,11 @@ const accordions = [
 <BaseLayout
   title={product.name}
   description={`${product.summary} Shop the ${product.name} from ${site.name}. Free shipping over ${shippingThreshold}.`}
-  image={product.images[0].src.src}
+  image={imageUrl(product.images[0])}
   imageAlt={product.images[0].alt}
   type="product"
   jsonLd={[
-    productSchema(product, url, product.images.map((image) => image.src.src)),
+    productSchema(product, url, product.images.map(imageUrl)),
     breadcrumbSchema(crumbs),
   ]}
 >

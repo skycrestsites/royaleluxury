@@ -1,5 +1,5 @@
 import { site } from './site';
-import type { Product } from './products';
+import type { Product } from './types';
 import type { Faq } from './faqs';
 
 export interface Crumb {

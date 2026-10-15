@@ -9,17 +9,30 @@
     "build": "astro build",
     "check": "astro check",
     "preview": "astro preview",
-    "brand": "node scripts/generate-brand-assets.mjs"
+    "brand": "node scripts/generate-brand-assets.mjs",
+    "dev:emulators": "astro dev --mode emulators",
+    "emulators": "npm --prefix functions run build && firebase emulators:start --project royaleluxury",
+    "functions:build": "npm --prefix functions run build",
+    "seed": "node scripts/seed.mjs",
+    "seed:prod": "node scripts/seed.mjs --prod"
   },
   "dependencies": {
+    "@astrojs/react": "^7.0.1",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "astro": "^7.3.8",
+    "firebase": "^13.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "firebase-admin": "^14.5.0",
+    "firebase-tools": "^15.34.0",
     "typescript": "^6.0.3"
   }
 }

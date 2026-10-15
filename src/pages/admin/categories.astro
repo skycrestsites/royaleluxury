@@ -1,0 +1,8 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import CategoriesPage from '../../admin/pages/CategoriesPage';
+---
+
+<AdminLayout title="Categories">
+  <CategoriesPage client:only="react" />
+</AdminLayout>

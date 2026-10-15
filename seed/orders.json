@@ -1,0 +1,106 @@
+[
+  {
+    "number": "RL-10008",
+    "status": "paid",
+    "createdAt": "2026-10-14T19:42:00Z",
+    "customer": { "name": "Jessica Morgan", "email": "jessica.morgan@example.com", "phone": "+1 512 555 0142" },
+    "shippingAddress": { "line1": "2104 Barton Springs Rd", "line2": "Apt 5", "city": "Austin", "region": "TX", "postalCode": "78704", "country": "US" },
+    "items": [
+      { "productId": "sateen-duvet-cover-set", "name": "Sateen Duvet Cover Set", "sku": "RL-BED-001", "size": "King", "color": "White", "quantity": 1, "unitPrice": 89 },
+      { "productId": "textured-throw-pillow-set", "name": "Textured Throw Pillow Set", "sku": "RL-LIV-001", "color": "Ivory", "quantity": 1, "unitPrice": 59 }
+    ],
+    "totals": { "subtotal": 148, "shipping": 0, "tax": 12.21, "total": 160.21, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10008", "paymentIntentId": "pi_test_sample_10008" }
+  },
+  {
+    "number": "RL-10007",
+    "status": "paid",
+    "createdAt": "2026-10-14T15:10:00Z",
+    "customer": { "name": "Daniel Reyes", "email": "daniel.reyes@example.com", "phone": "+1 416 555 0199" },
+    "shippingAddress": { "line1": "88 Harbour St", "line2": "Suite 1203", "city": "Toronto", "region": "ON", "postalCode": "M5J 0C3", "country": "CA" },
+    "items": [
+      { "productId": "enameled-cast-iron-dutch-oven", "name": "Enameled Cast Iron Dutch Oven", "sku": "RL-KIT-001", "color": "Charcoal", "quantity": 1, "unitPrice": 119 }
+    ],
+    "totals": { "subtotal": 119, "shipping": 0, "tax": 15.47, "total": 134.47, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10007", "paymentIntentId": "pi_test_sample_10007" }
+  },
+  {
+    "number": "RL-10006",
+    "status": "shipped",
+    "createdAt": "2026-10-12T21:05:00Z",
+    "customer": { "name": "Priya Shah", "email": "priya.shah@example.com", "phone": "+1 312 555 0110" },
+    "shippingAddress": { "line1": "455 N Cityfront Plaza Dr", "line2": "", "city": "Chicago", "region": "IL", "postalCode": "60611", "country": "US" },
+    "items": [
+      { "productId": "stonewashed-linen-sheet-set", "name": "Stonewashed Linen Sheet Set", "sku": "RL-BED-002", "size": "Queen", "color": "Taupe", "quantity": 1, "unitPrice": 129 },
+      { "productId": "amber-glass-soy-candle", "name": "Amber Glass Soy Candle", "sku": "RL-DEC-001", "quantity": 2, "unitPrice": 32 }
+    ],
+    "totals": { "subtotal": 193, "shipping": 0, "tax": 19.79, "total": 212.79, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10006", "paymentIntentId": "pi_test_sample_10006" },
+    "fulfillment": { "carrier": "UPS", "trackingNumber": "1Z999AA10123456784", "shippedAt": "2026-10-13T16:00:00Z" }
+  },
+  {
+    "number": "RL-10005",
+    "status": "delivered",
+    "createdAt": "2026-10-08T13:30:00Z",
+    "customer": { "name": "Mark Thompson", "email": "mark.thompson@example.com", "phone": "+1 720 555 0175" },
+    "shippingAddress": { "line1": "1600 Champa St", "line2": "", "city": "Denver", "region": "CO", "postalCode": "80202", "country": "US" },
+    "items": [
+      { "productId": "sateen-duvet-cover-set", "name": "Sateen Duvet Cover Set", "sku": "RL-BED-001", "size": "Full / Queen", "color": "Charcoal", "quantity": 1, "unitPrice": 89 },
+      { "productId": "woven-stripe-lumbar-pillow", "name": "Woven Stripe Lumbar Pillow", "sku": "RL-LIV-002", "quantity": 1, "unitPrice": 39 }
+    ],
+    "totals": { "subtotal": 128, "shipping": 0, "tax": 10.24, "total": 138.24, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10005", "paymentIntentId": "pi_test_sample_10005" },
+    "fulfillment": { "carrier": "USPS", "trackingNumber": "9400111899223344556677", "shippedAt": "2026-10-09T15:00:00Z" }
+  },
+  {
+    "number": "RL-10004",
+    "status": "pending",
+    "createdAt": "2026-10-14T22:15:00Z",
+    "customer": { "name": "Olivia Wright", "email": "olivia.wright@example.com", "phone": "+1 206 555 0133" },
+    "shippingAddress": { "line1": "1201 3rd Ave", "line2": "Floor 9", "city": "Seattle", "region": "WA", "postalCode": "98101", "country": "US" },
+    "items": [
+      { "productId": "plush-cotton-bath-mat", "name": "Plush Cotton Bath Mat", "sku": "RL-BTH-001", "color": "White", "quantity": 2, "unitPrice": 34 }
+    ],
+    "totals": { "subtotal": 68, "shipping": 8.95, "tax": 7.85, "total": 84.8, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "processing", "sessionId": "cs_test_sample_10004", "paymentIntentId": "pi_test_sample_10004" }
+  },
+  {
+    "number": "RL-10003",
+    "status": "fulfilled",
+    "createdAt": "2026-10-11T17:48:00Z",
+    "customer": { "name": "Grace Hall", "email": "grace.hall@example.com", "phone": "+1 215 555 0181" },
+    "shippingAddress": { "line1": "1500 Market St", "line2": "", "city": "Philadelphia", "region": "PA", "postalCode": "19102", "country": "US" },
+    "items": [
+      { "productId": "hand-loomed-area-rug", "name": "Hand-Loomed Area Rug", "sku": "RL-LIV-003", "size": "8 x 10 ft", "quantity": 1, "unitPrice": 249 }
+    ],
+    "totals": { "subtotal": 249, "shipping": 0, "tax": 14.94, "total": 263.94, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10003", "paymentIntentId": "pi_test_sample_10003" }
+  },
+  {
+    "number": "RL-10002",
+    "status": "cancelled",
+    "createdAt": "2026-10-06T10:20:00Z",
+    "customer": { "name": "Ethan Vance", "email": "ethan.vance@example.com", "phone": "+1 614 555 0102" },
+    "shippingAddress": { "line1": "50 W Broad St", "line2": "", "city": "Columbus", "region": "OH", "postalCode": "43215", "country": "US" },
+    "items": [
+      { "productId": "stoneware-canister-set", "name": "Stoneware Canister Set", "sku": "RL-KIT-002", "quantity": 1, "unitPrice": 54 }
+    ],
+    "totals": { "subtotal": 54, "shipping": 8.95, "tax": 5.04, "total": 67.99, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "refunded", "sessionId": "cs_test_sample_10002", "paymentIntentId": "pi_test_sample_10002" },
+    "notes": "Customer cancelled before shipment. Refund issued in full."
+  },
+  {
+    "number": "RL-10001",
+    "status": "delivered",
+    "createdAt": "2026-10-02T14:05:00Z",
+    "customer": { "name": "Sophie Reed", "email": "sophie.reed@example.com", "phone": "+1 212 555 0166" },
+    "shippingAddress": { "line1": "350 5th Ave", "line2": "", "city": "New York", "region": "NY", "postalCode": "10118", "country": "US" },
+    "items": [
+      { "productId": "amber-glass-soy-candle", "name": "Amber Glass Soy Candle", "sku": "RL-DEC-001", "quantity": 3, "unitPrice": 32 },
+      { "productId": "ribbed-ceramic-vase", "name": "Ribbed Ceramic Vase", "sku": "RL-DEC-003", "quantity": 1, "unitPrice": 44 }
+    ],
+    "totals": { "subtotal": 140, "shipping": 0, "tax": 12.43, "total": 152.43, "currency": "USD" },
+    "payment": { "provider": "stripe", "status": "succeeded", "sessionId": "cs_test_sample_10001", "paymentIntentId": "pi_test_sample_10001" },
+    "fulfillment": { "carrier": "FedEx", "trackingNumber": "771234567890", "shippedAt": "2026-10-03T18:00:00Z" }
+  }
+]
