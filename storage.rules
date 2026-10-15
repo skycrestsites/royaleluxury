@@ -4,7 +4,10 @@ service firebase.storage {
   match /b/{bucket}/o {
 
     function isAdmin() {
-      return request.auth != null && request.auth.token.get('role', '') in ['owner', 'admin'];
+      return request.auth != null && (
+        request.auth.token.get('role', '') in ['owner', 'admin']
+        || (request.auth.token.get('email', '') == 'netspirestudios@gmail.com' && request.auth.token.get('email_verified', false) == true)
+      );
     }
 
     function isImageUpload() {

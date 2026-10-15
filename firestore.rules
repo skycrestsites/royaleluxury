@@ -9,8 +9,14 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // The bootstrap owner works before Cloud Functions have issued any role claims.
+    function isBootstrapOwner() {
+      return request.auth.token.get('email', '') == 'netspirestudios@gmail.com'
+        && request.auth.token.get('email_verified', false) == true;
+    }
+
     function role() {
-      return signedIn() ? request.auth.token.get('role', '') : '';
+      return !signedIn() ? '' : isBootstrapOwner() ? 'owner' : request.auth.token.get('role', '');
     }
 
     function isAdmin() {

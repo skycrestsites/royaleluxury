@@ -21,9 +21,13 @@ export type Session =
 const LOGIN_PATH = '/adminlogin/';
 const HOME_PATH = '/admin/';
 
+/** Must match the bootstrap owner in firestore.rules and storage.rules. */
+const BOOTSTRAP_OWNER = 'netspirestudios@gmail.com';
+
 async function roleOf(user: User, forceRefresh = false): Promise<Role | null> {
   const { claims } = await user.getIdTokenResult(forceRefresh);
-  return claims.role === 'owner' || claims.role === 'admin' ? claims.role : null;
+  if (claims.role === 'owner' || claims.role === 'admin') return claims.role;
+  return claims.email === BOOTSTRAP_OWNER && claims.email_verified === true ? 'owner' : null;
 }
 
 /** Tracks the signed-in admin and their role. */
