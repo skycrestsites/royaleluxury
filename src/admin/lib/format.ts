@@ -47,15 +47,18 @@ export function errorMessage(error: unknown) {
     'auth/weak-password': 'Use a password with at least 8 characters.',
     'auth/popup-closed-by-user': 'The sign-in window was closed.',
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+    'auth/unauthorized-domain': 'This domain is not authorized for sign-in. Add it in Firebase Authentication settings.',
+    'auth/operation-not-allowed': 'This sign-in method is not enabled in Firebase Authentication.',
+    'auth/popup-blocked': 'The sign-in popup was blocked. Allow popups for this site and try again.',
+    'auth/cancelled-popup-request': 'The sign-in window was closed.',
     'permission-denied': 'You do not have permission to do that.',
     'functions/permission-denied': 'You do not have permission to do that.',
   };
   if (known[code]) return known[code];
-  const message = (error as { message?: string })?.message;
-  return (
-    message
-      ?.replace(/^Firebase:\s*/, '')
-      .replace(/\s*\(.*\)\.?$/, '')
-      .replace(/\s*\[\d+\]$/, '') || 'Something went wrong. Please try again.'
-  );
+  const message = (error as { message?: string })?.message
+    ?.replace(/^Firebase:\s*/, '')
+    .replace(/\s*\(.*\)\.?$/, '')
+    .replace(/\s*\[\d+\]$/, '');
+  if (!message || message === 'Error') return code ? `Something went wrong (${code}).` : 'Something went wrong. Please try again.';
+  return message;
 }
