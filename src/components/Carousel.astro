@@ -1,0 +1,98 @@
+---
+/**
+ * A grid on larger screens that becomes a swipeable, snap-scrolling row on mobile.
+ */
+interface Props {
+  columns?: number;
+  mobileItemWidth?: string;
+  label: string;
+}
+
+const { columns = 4, mobileItemWidth = '78%', label } = Astro.props;
+---
+
+<div class="carousel" data-carousel style={`--columns: ${columns}; --mobile-width: ${mobileItemWidth};`}>
+  <div class="carousel-track" role="region" aria-label={label} tabindex="0" data-carousel-track>
+    <slot />
+  </div>
+  <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
+</div>
+
+<style>
+  .carousel-track {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  .carousel-dots {
+    display: none;
+  }
+
+  @media (max-width: 860px) {
+    .carousel-track {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: var(--mobile-width);
+      gap: 1rem;
+      margin-inline: calc(var(--pad) * -1);
+      padding-inline: var(--pad);
+      scroll-padding-inline: var(--pad);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .carousel-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-track > :global(*) {
+      scroll-snap-align: start;
+    }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .carousel-dots :global(span) {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--line);
+      transition: width 0.3s var(--ease), background-color 0.3s var(--ease);
+    }
+
+    .carousel-dots :global(span.is-active) {
+      width: 20px;
+      border-radius: 3px;
+      background: var(--charcoal);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>('[data-carousel-track]');
+    const dotsEl = carousel.querySelector<HTMLElement>('[data-carousel-dots]');
+    if (!track || !dotsEl) return;
+
+    const items = Array.from(track.children) as HTMLElement[];
+    const dots = items.map(() => dotsEl.appendChild(document.createElement('span')));
+
+    const update = () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const progress = maxScroll > 0 ? track.scrollLeft / maxScroll : 0;
+      const active = Math.round(progress * (items.length - 1));
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === active));
+    };
+
+    update();
+    track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+  });
+</script>

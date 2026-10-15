@@ -1,0 +1,30 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { breadcrumbSchema } from '../data/schema';
+
+interface Props {
+  title: string;
+  heading: string;
+  description: string;
+  path: string;
+  updated: string;
+}
+
+const { title, heading, description, path, updated } = Astro.props;
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: title, href: path },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={[breadcrumbSchema(crumbs)]}>
+  <PageHeader title={heading} lead={`Last updated ${updated}`} crumbs={crumbs} />
+  <section class="section">
+    <div class="container">
+      <article class="prose">
+        <slot />
+      </article>
+    </div>
+  </section>
+</BaseLayout>

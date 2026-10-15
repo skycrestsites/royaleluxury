@@ -1,0 +1,83 @@
+---
+import Icon from './Icon.astro';
+import Rating from './Rating.astro';
+import type { Review } from '../data/products';
+
+interface Props {
+  review: Review;
+  productName?: string;
+}
+
+const { review, productName } = Astro.props;
+const date = new Date(`${review.date}T12:00:00`).toLocaleDateString('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric',
+});
+---
+
+<article class="review-card">
+  <Rating value={review.rating} size={14} />
+  <h3>{review.title}</h3>
+  <p class="review-body">{review.body}</p>
+  <footer>
+    <p class="review-author">
+      {review.author}
+      <span class="verified"><Icon name="check" size={13} /> Verified buyer</span>
+    </p>
+    <p class="review-meta">
+      {review.location} <span aria-hidden="true">&middot;</span> <time datetime={review.date}>{date}</time>
+    </p>
+    {productName && <p class="review-product">Purchased: {productName}</p>}
+  </footer>
+</article>
+
+<style>
+  .review-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    height: 100%;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 1px solid var(--line);
+    background: var(--white);
+  }
+
+  .review-body {
+    flex: 1;
+    color: var(--text-muted);
+  }
+
+  footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+  }
+
+  .review-author {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    font-weight: 600;
+  }
+
+  .verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--champagne-deep);
+  }
+
+  .review-meta,
+  .review-product {
+    color: var(--text-muted);
+  }
+
+  .review-product {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+  }
+</style>

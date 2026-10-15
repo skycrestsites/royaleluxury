@@ -1,0 +1,143 @@
+---
+import { Picture } from 'astro:assets';
+import Rating from './Rating.astro';
+import { getCategory } from '../data/categories';
+import { productUrl, type Product } from '../data/products';
+import { formatPrice } from '../data/site';
+
+interface Props {
+  product: Product;
+  eager?: boolean;
+}
+
+const { product, eager = false } = Astro.props;
+const [primary, secondary] = product.images;
+const category = getCategory(product.category);
+const sizes = '(max-width: 720px) 50vw, (max-width: 1024px) 33vw, 300px';
+---
+
+<article class="product-card" data-price={product.price}>
+  <a href={productUrl(product.slug)} class="card-link">
+    <div class="card-media">
+      <Picture
+        src={primary.src}
+        alt={primary.alt}
+        widths={[320, 480, 640]}
+        sizes={sizes}
+        formats={['avif', 'webp']}
+        class="card-img"
+        loading={eager ? 'eager' : 'lazy'}
+      />
+      {
+        secondary && (
+          <Picture
+            src={secondary.src}
+            alt=""
+            widths={[320, 480, 640]}
+            sizes={sizes}
+            formats={['avif', 'webp']}
+            class="card-img card-img--alt"
+          />
+        )
+      }
+      {product.badge && <span class="badge">{product.badge}</span>}
+    </div>
+    <div class="card-body">
+      {category && <p class="card-category">{category.name}</p>}
+      <h3 class="card-title">{product.name}</h3>
+      <Rating value={product.rating} count={product.reviewCount} size={12} />
+      <p class="card-price">
+        <span>{formatPrice(product.price)}</span>
+        {product.compareAtPrice && <s class="muted">{formatPrice(product.compareAtPrice)}</s>}
+      </p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card-link {
+    display: block;
+  }
+
+  .card-media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .card-media :global(picture),
+  .card-media :global(.card-img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      opacity 0.5s var(--ease),
+      transform 0.8s var(--ease);
+  }
+
+  .card-media :global(.card-img--alt) {
+    opacity: 0;
+  }
+
+  @media (hover: hover) {
+    .card-link:hover :global(.card-img) {
+      transform: scale(1.04);
+    }
+
+    .card-link:hover :global(.card-img--alt) {
+      opacity: 1;
+    }
+  }
+
+  .badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.35rem 0.65rem;
+    background: var(--white);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .card-body {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 1rem;
+  }
+
+  .card-category {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--champagne-deep);
+  }
+
+  .card-title {
+    font-size: 0.98rem;
+    font-weight: 500;
+  }
+
+  .card-price {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    font-weight: 600;
+  }
+
+  .card-price s {
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+
+  @media (max-width: 480px) {
+    .card-title {
+      font-size: 0.9rem;
+    }
+  }
+</style>

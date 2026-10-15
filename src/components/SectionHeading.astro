@@ -1,0 +1,66 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  align?: 'left' | 'center';
+  as?: 'h1' | 'h2';
+}
+
+const { eyebrow, title, lead, align = 'left', as: Tag = 'h2' } = Astro.props;
+const hasAction = Astro.slots.has('default');
+---
+
+<div class:list={['section-heading', `section-heading--${align}`, { 'has-action': hasAction }]}>
+  <div>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <Tag set:html={title} />
+    {lead && <p class="lead">{lead}</p>}
+  </div>
+  {hasAction && <div class="section-heading-action"><slot /></div>}
+</div>
+
+<style>
+  .section-heading {
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .section-heading .eyebrow {
+    margin-bottom: 1rem;
+  }
+
+  .section-heading .lead {
+    margin-top: 1rem;
+  }
+
+  .section-heading--center {
+    text-align: center;
+  }
+
+  .section-heading--center .eyebrow::before {
+    display: none;
+  }
+
+  .section-heading--center .lead {
+    margin-inline: auto;
+  }
+
+  .has-action {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .section-heading-action {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 720px) {
+    .has-action {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+  }
+</style>

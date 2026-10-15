@@ -1,0 +1,191 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Carousel from '../components/Carousel.astro';
+import RoomTile from '../components/RoomTile.astro';
+import CtaBand from '../components/CtaBand.astro';
+import storyImage from '../assets/images/story-living.jpg';
+import bedroomImage from '../assets/images/room-bedroom.jpg';
+import { categories } from '../data/categories';
+import { breadcrumbSchema } from '../data/schema';
+import { site } from '../data/site';
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'About', href: '/about/' },
+];
+
+const values = [
+  { title: 'Design with restraint', text: 'A calm, consistent palette and clean silhouettes that stay beautiful year after year.' },
+  { title: 'Materials that last', text: 'Natural fibres, stoneware and cast iron chosen for how they perform after hundreds of uses.' },
+  { title: 'Prices that make sense', text: 'We skip the middlemen and the inflated markups, so quality stays within reach.' },
+];
+---
+
+<BaseLayout
+  title="About Us"
+  description={`Learn about ${site.name}: hotel-inspired home essentials designed with restraint, made from quality materials and offered at sensible prices.`}
+  jsonLd={[breadcrumbSchema(crumbs)]}
+>
+  <PageHeader
+    eyebrow="Our Story"
+    title="Beautiful living, <em>sensibly priced</em>"
+    lead="We started Royale Luxury with a simple belief: a home that feels calm and considered should not require a luxury budget."
+    crumbs={crumbs}
+  />
+
+  <section class="section">
+    <div class="container split">
+      <div class="split-media">
+        <Picture src={storyImage} alt="Calm, light-filled living room with natural textures" widths={[480, 720, 960]} sizes="(max-width: 900px) 100vw, 50vw" formats={['avif', 'webp']} />
+      </div>
+      <div class="prose">
+        <h2>Why we <em>exist</em></h2>
+        <p>
+          Walk into a great boutique hotel and you notice how everything feels intentional. The bedding is crisp, the
+          colours are calm and every object has a reason to be there. We wanted that feeling at home, without the price
+          tag that usually comes with it.
+        </p>
+        <p>
+          So we built Royale Luxury around a short list of essentials for the bedroom, living room, kitchen and bath.
+          Each piece is developed with experienced makers, tested in real homes and offered directly to you at a fair
+          price.
+        </p>
+        <p>
+          The result is a collection that feels elevated but never precious: things you will reach for every day and
+          still love years from now.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section values-section">
+    <div class="container">
+      <SectionHeading eyebrow="What We Stand For" title="Our <em>values</em>" align="center" />
+      <ol role="list" class="values">
+        {
+          values.map((value, i) => (
+            <li>
+              <span class="value-num">0{i + 1}</span>
+              <h3>{value.title}</h3>
+              <p>{value.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split split--reverse">
+      <div class="split-media">
+        <Picture src={bedroomImage} alt="Bedroom dressed in layered neutral bedding" widths={[480, 720, 960]} sizes="(max-width: 900px) 100vw, 50vw" formats={['avif', 'webp']} />
+      </div>
+      <div class="prose">
+        <h2>Our <em>promise</em></h2>
+        <p>
+          Every order ships free over ${site.freeShippingThreshold} and is backed by our {site.returnWindowDays}-day
+          return policy. If something is not right, we will make it right.
+        </p>
+        <p>
+          Questions about sizing, materials or styling? Our support team is made up of real people who know the
+          products well. <a href="/contact/">Get in touch</a> any time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container">
+      <SectionHeading eyebrow="Shop by Room" title="Explore the <em>collection</em>" />
+      <Carousel columns={5} mobileItemWidth="68%" label="Shop by room">
+        {categories.map((category) => <RoomTile category={category} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+
+  .split--reverse .split-media {
+    order: 2;
+  }
+
+  .split-media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .split-media :global(picture),
+  .split-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .split .prose h2 {
+    margin-top: 0;
+    font-size: clamp(2.1rem, 4.2vw, 3.4rem);
+  }
+
+  .values-section {
+    background: var(--charcoal);
+    color: var(--white);
+  }
+
+  .values-section :global(.eyebrow),
+  .values-section :global(h2 em) {
+    color: var(--champagne);
+  }
+
+  .values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .values li {
+    padding: clamp(1.75rem, 3vw, 2.75rem);
+    background: var(--charcoal);
+  }
+
+  .value-num {
+    display: block;
+    margin-bottom: 1.25rem;
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--champagne);
+    line-height: 1;
+  }
+
+  .values h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  .values p {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  @media (max-width: 900px) {
+    .split,
+    .values {
+      grid-template-columns: 1fr;
+    }
+
+    .split--reverse .split-media {
+      order: 0;
+    }
+  }
+</style>

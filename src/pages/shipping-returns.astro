@@ -1,0 +1,46 @@
+---
+import PolicyLayout from '../layouts/PolicyLayout.astro';
+import { site } from '../data/site';
+---
+
+<PolicyLayout
+  title="Shipping and Returns"
+  heading="Shipping and <em>returns</em>"
+  description={`${site.name} shipping times, rates and our ${site.returnWindowDays}-day return policy.`}
+  path="/shipping-returns/"
+  updated="October 2026"
+>
+  <h2>Shipping</h2>
+  <p>
+    Orders are processed within 1 to 2 business days. Standard delivery typically takes 3 to 7 business days after
+    your order ships. As soon as your order leaves our warehouse you will receive a confirmation email with tracking
+    details.
+  </p>
+  <ul>
+    <li>Free standard shipping on orders over ${site.freeShippingThreshold}</li>
+    <li>A flat rate applies to orders under ${site.freeShippingThreshold} and is shown at checkout</li>
+    <li>Larger items such as rugs may ship separately</li>
+  </ul>
+
+  <h2>Returns</h2>
+  <p>
+    We want you to love every piece. If something is not right, you can return unused items in their original
+    condition within {site.returnWindowDays} days of delivery for a full refund to your original payment method.
+  </p>
+  <p>
+    To start a return, email <a href={`mailto:${site.email}`}>{site.email}</a> with your order number and the items
+    you would like to send back. We will reply with a prepaid return label and instructions.
+  </p>
+
+  <h2>Exchanges</h2>
+  <p>
+    Need a different size or colour? The fastest option is to return the original item and place a new order. If you
+    need help, our team is happy to arrange an exchange for you.
+  </p>
+
+  <h2>Damaged or incorrect items</h2>
+  <p>
+    If anything arrives damaged or is not what you ordered, contact us within 7 days of delivery with a photo and we
+    will send a replacement at no cost.
+  </p>
+</PolicyLayout>

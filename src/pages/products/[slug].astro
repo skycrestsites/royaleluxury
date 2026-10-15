@@ -1,0 +1,731 @@
+---
+import { getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ProductGallery from '../../components/ProductGallery.astro';
+import Rating from '../../components/Rating.astro';
+import Icon from '../../components/Icon.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import Carousel from '../../components/Carousel.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { getCategory, categoryUrl } from '../../data/categories';
+import { getSimilarProducts, productUrl, products, type Product } from '../../data/products';
+import { formatPrice, site } from '../../data/site';
+import { breadcrumbSchema, productSchema } from '../../data/schema';
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const category = getCategory(product.category)!;
+const similar = getSimilarProducts(product);
+const url = productUrl(product.slug);
+const savings = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
+const thumbnail = await getImage({ src: product.images[0].src, width: 200, format: 'webp' });
+const shippingThreshold = formatPrice(site.freeShippingThreshold).replace('.00', '');
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: category.name, href: categoryUrl(category.slug) },
+  { name: product.name, href: url },
+];
+
+const accordions = [
+  { title: 'Description', open: true, paragraphs: product.description },
+  { title: 'Details', open: false, rows: product.details },
+  { title: 'Care', open: false, list: product.care },
+  {
+    title: 'Shipping and Returns',
+    open: false,
+    paragraphs: [
+      `Free standard shipping on orders over ${shippingThreshold}. Orders are processed within 1 to 2 business days and typically arrive in 3 to 7 business days.`,
+      `Return unused items within ${site.returnWindowDays} days of delivery for a full refund.`,
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={product.name}
+  description={`${product.summary} Shop the ${product.name} from ${site.name}. Free shipping over ${shippingThreshold}.`}
+  image={product.images[0].src.src}
+  imageAlt={product.images[0].alt}
+  type="product"
+  jsonLd={[
+    productSchema(product, url, product.images.map((image) => image.src.src)),
+    breadcrumbSchema(crumbs),
+  ]}
+>
+  <div class="container product-top">
+    <Breadcrumbs items={crumbs} />
+  </div>
+
+  <section class="container product">
+    <div class="product-media">
+      <ProductGallery images={product.images} />
+    </div>
+
+    <div class="product-info">
+      <a class="eyebrow" href={categoryUrl(category.slug)}>{category.name}</a>
+      <h1>{product.name}</h1>
+
+      <a class="rating-link" href="#reviews">
+        <Rating value={product.rating} size={15} showValue />
+        <span>{product.reviewCount} reviews</span>
+      </a>
+
+      <div class="price">
+        <span class="price-now">{formatPrice(product.price)}</span>
+        {
+          product.compareAtPrice && (
+            <>
+              <s class="price-was">{formatPrice(product.compareAtPrice)}</s>
+              <span class="price-save">Save {formatPrice(savings)}</span>
+            </>
+          )
+        }
+      </div>
+
+      <p class="summary">{product.summary}</p>
+
+      <form
+        class="buy-form"
+        data-buy-form
+        data-slug={product.slug}
+        data-name={product.name}
+        data-price={product.price}
+        data-image={thumbnail.src}
+      >
+        {
+          product.colors && (
+            <fieldset class="option">
+              <legend>
+                Colour: <span data-selected="color">{product.colors[0].name}</span>
+              </legend>
+              <div class="swatches">
+                {product.colors.map((color, i) => (
+                  <label class="swatch" title={color.name}>
+                    <input type="radio" name="color" value={color.name} checked={i === 0} />
+                    <span style={`--swatch: ${color.hex}`} />
+                    <span class="visually-hidden">{color.name}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )
+        }
+
+        {
+          product.sizes && (
+            <fieldset class="option">
+              <legend>
+                Size: <span data-selected="size">{product.sizes[1] ?? product.sizes[0]}</span>
+              </legend>
+              <div class="pills">
+                {product.sizes.map((size, i) => (
+                  <label class="pill">
+                    <input type="radio" name="size" value={size} checked={i === Math.min(1, product.sizes!.length - 1)} />
+                    <span>{size}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )
+        }
+
+        <div class="buy-row">
+          <div class="qty" role="group" aria-label="Quantity">
+            <button type="button" aria-label="Decrease quantity" data-qty="-1">
+              <Icon name="minus" size={16} />
+            </button>
+            <input type="number" name="quantity" value="1" min="1" max="10" inputmode="numeric" aria-label="Quantity" />
+            <button type="button" aria-label="Increase quantity" data-qty="1">
+              <Icon name="plus" size={16} />
+            </button>
+          </div>
+          <button class="btn add-btn" type="submit" data-add-button>Add to Bag</button>
+        </div>
+      </form>
+
+      <ul role="list" class="assurances">
+        <li><Icon name="truck" size={20} /> Free shipping on orders over {shippingThreshold}</li>
+        <li><Icon name="returns" size={20} /> {site.returnWindowDays}-day hassle-free returns</li>
+        <li><Icon name="shield" size={20} /> Secure, encrypted checkout</li>
+      </ul>
+
+      <div class="accordions">
+        {
+          accordions.map((item) => (
+            <details class="accordion" open={item.open}>
+              <summary>
+                {item.title}
+                <Icon name="plus" size={18} class="accordion-icon" />
+              </summary>
+              <div class="accordion-body">
+                {item.paragraphs?.map((p) => <p>{p}</p>)}
+                {item.title === 'Description' && (
+                  <ul class="bullets">
+                    {product.highlights.map((h) => <li>{h}</li>)}
+                  </ul>
+                )}
+                {item.rows && (
+                  <dl class="spec">
+                    {item.rows.map((row) => (
+                      <div>
+                        <dt>{row.label}</dt>
+                        <dd>{row.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                {item.list && (
+                  <ul class="bullets">
+                    {item.list.map((entry) => <li>{entry}</li>)}
+                  </ul>
+                )}
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section reviews" id="reviews">
+    <div class="container">
+      <div class="reviews-head">
+        <SectionHeading eyebrow="Reviews" title="What customers <em>are saying</em>" />
+        <div class="reviews-summary">
+          <p class="reviews-score">{product.rating.toFixed(1)}</p>
+          <div>
+            <Rating value={product.rating} size={18} />
+            <p class="muted">Based on {product.reviewCount} reviews</p>
+          </div>
+        </div>
+      </div>
+      <Carousel columns={2} mobileItemWidth="86%" label="Product reviews">
+        {product.reviews.map((review) => <ReviewCard review={review} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="You May Also Like" title="Similar <em>items</em>">
+        <a class="link-arrow" href={categoryUrl(category.slug)}>Shop {category.name} <Icon name="arrowRight" size={14} /></a>
+      </SectionHeading>
+      <Carousel columns={4} mobileItemWidth="64%" label="Similar items">
+        {similar.map((item) => <ProductCard product={item} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <div class="sticky-buy" data-sticky-buy aria-hidden="true">
+    <div>
+      <p class="sticky-name">{product.name}</p>
+      <p class="sticky-price">{formatPrice(product.price)}</p>
+    </div>
+    <button class="btn" type="button" tabindex="-1" data-sticky-add>Add to Bag</button>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite" data-toast>
+    <Icon name="check" size={18} />
+    <span data-toast-text>Added to your bag</span>
+    <a href="/bag/">View bag</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .product-top {
+    padding-top: 1.5rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .product-media {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+  }
+
+  .product-info .eyebrow {
+    margin-bottom: 0.9rem;
+  }
+
+  .product-info h1 {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+  }
+
+  .rating-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .rating-link > span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .price-now {
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .price-was {
+    color: var(--text-muted);
+  }
+
+  .price-save {
+    padding: 0.2rem 0.55rem;
+    background: var(--charcoal);
+    color: var(--white);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .summary {
+    margin-top: 1.25rem;
+    color: var(--text-muted);
+  }
+
+  .buy-form {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .option {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .option legend {
+    margin-bottom: 0.85rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .option legend span {
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  .swatches,
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .swatch,
+  .pill {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .swatch input,
+  .pill input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .swatch > span:not(.visually-hidden) {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--swatch);
+    box-shadow:
+      inset 0 0 0 1px rgba(38, 42, 51, 0.15),
+      0 0 0 3px var(--white),
+      0 0 0 4px transparent;
+    transition: box-shadow 0.2s var(--ease);
+  }
+
+  .swatch input:checked + span {
+    box-shadow:
+      inset 0 0 0 1px rgba(38, 42, 51, 0.15),
+      0 0 0 3px var(--white),
+      0 0 0 4px var(--charcoal);
+  }
+
+  .swatch input:focus-visible + span,
+  .pill input:focus-visible + span {
+    outline: 2px solid var(--champagne-deep);
+    outline-offset: 4px;
+  }
+
+  .pill span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--line);
+    font-size: 0.85rem;
+    transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease);
+  }
+
+  .pill:hover span {
+    border-color: var(--charcoal);
+  }
+
+  .pill input:checked + span {
+    border-color: var(--charcoal);
+    background: var(--charcoal);
+    color: var(--white);
+  }
+
+  .buy-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .qty {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--line);
+  }
+
+  .qty button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    border: 0;
+    background: none;
+  }
+
+  .qty input {
+    width: 2.5rem;
+    border: 0;
+    text-align: center;
+    font-weight: 600;
+    -moz-appearance: textfield;
+  }
+
+  .qty input::-webkit-outer-spin-button,
+  .qty input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .add-btn {
+    flex: 1;
+  }
+
+  .assurances {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.75rem;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+
+  .assurances li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .assurances :global(svg) {
+    color: var(--champagne-deep);
+  }
+
+  .accordions {
+    margin-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .accordion {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 1.15rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion :global(.accordion-icon) {
+    transition: transform 0.3s var(--ease);
+  }
+
+  .accordion[open] :global(.accordion-icon) {
+    transform: rotate(45deg);
+  }
+
+  .accordion-body {
+    display: grid;
+    gap: 0.9rem;
+    padding-bottom: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .bullets {
+    padding-left: 1.1rem;
+  }
+
+  .bullets li + li {
+    margin-top: 0.35rem;
+  }
+
+  .spec div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 1rem;
+    padding-block: 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .spec div:last-child {
+    border-bottom: 0;
+  }
+
+  .spec dt {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .reviews {
+    margin-top: var(--section);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .reviews-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .reviews-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .reviews-score {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .reviews-summary .muted {
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  .sticky-buy {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem var(--pad) calc(0.75rem + env(safe-area-inset-bottom));
+    background: var(--white);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgba(38, 42, 51, 0.08);
+    transform: translateY(100%);
+    transition: transform 0.3s var(--ease);
+  }
+
+  .sticky-buy.is-visible {
+    transform: none;
+  }
+
+  .sticky-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .sticky-price {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .sticky-buy .btn {
+    flex-shrink: 0;
+    min-height: 2.9rem;
+    padding-inline: 1.5rem;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.25rem;
+    background: var(--charcoal);
+    color: var(--white);
+    font-size: 0.9rem;
+    box-shadow: 0 16px 40px rgba(38, 42, 51, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 1rem);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  }
+
+  .toast.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  .toast :global(svg) {
+    color: var(--champagne);
+  }
+
+  .toast a {
+    margin-left: 0.5rem;
+    color: var(--champagne);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 900px) {
+    :global(body) {
+      padding-bottom: 72px;
+    }
+
+    .product {
+      grid-template-columns: 1fr;
+    }
+
+    .product-media {
+      position: static;
+    }
+
+    .sticky-buy {
+      display: flex;
+    }
+
+    .toast {
+      bottom: 5.5rem;
+      width: calc(100% - 2 * var(--pad));
+    }
+
+    .reviews-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+  }
+</style>
+
+<script>
+  import { addToBag } from '../../scripts/bag';
+
+  const form = document.querySelector<HTMLFormElement>('[data-buy-form]');
+  const toast = document.querySelector<HTMLElement>('[data-toast]');
+  const toastText = document.querySelector<HTMLElement>('[data-toast-text]');
+  const stickyBar = document.querySelector<HTMLElement>('[data-sticky-buy]');
+  const stickyAdd = document.querySelector<HTMLButtonElement>('[data-sticky-add]');
+  const addButton = document.querySelector<HTMLButtonElement>('[data-add-button]');
+  let toastTimer: number | undefined;
+
+  if (form) {
+    const quantityInput = form.querySelector<HTMLInputElement>('input[name="quantity"]')!;
+
+    form.addEventListener('change', (event) => {
+      const input = event.target as HTMLInputElement;
+      const label = form.querySelector<HTMLElement>(`[data-selected="${input.name}"]`);
+      if (label) label.textContent = input.value;
+    });
+
+    form.querySelectorAll<HTMLButtonElement>('[data-qty]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = Number(quantityInput.value) + Number(button.dataset.qty);
+        quantityInput.value = String(Math.min(10, Math.max(1, next)));
+      });
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const quantity = Math.min(10, Math.max(1, Number(data.get('quantity')) || 1));
+
+      addToBag({
+        slug: form.dataset.slug!,
+        name: form.dataset.name!,
+        price: Number(form.dataset.price),
+        image: form.dataset.image!,
+        color: (data.get('color') as string) ?? undefined,
+        size: (data.get('size') as string) ?? undefined,
+        quantity,
+      });
+
+      if (toast && toastText) {
+        toastText.textContent = `${quantity} added to your bag`;
+        toast.classList.add('is-visible');
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 3500);
+      }
+    });
+
+    stickyAdd?.addEventListener('click', () => form.requestSubmit());
+  }
+
+  if (stickyBar && addButton) {
+    const observer = new IntersectionObserver(([entry]) => {
+      const pastButton = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      stickyBar.classList.toggle('is-visible', pastButton);
+      stickyBar.setAttribute('aria-hidden', String(!pastButton));
+      stickyAdd?.setAttribute('tabindex', pastButton ? '0' : '-1');
+    });
+    observer.observe(addButton);
+  }
+</script>

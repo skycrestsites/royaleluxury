@@ -1,0 +1,46 @@
+---
+import PolicyLayout from '../layouts/PolicyLayout.astro';
+import { site } from '../data/site';
+---
+
+<PolicyLayout
+  title="Terms of Service"
+  heading="Terms of <em>service</em>"
+  description={`The terms that apply when you use the ${site.name} website and purchase our products.`}
+  path="/terms/"
+  updated="October 2026"
+>
+  <p>
+    By using this website or placing an order with {site.name}, you agree to the following terms. Please read them
+    carefully.
+  </p>
+
+  <h2>Products and pricing</h2>
+  <p>
+    We make every effort to display our products, colours and prices accurately. Colours may vary slightly depending on
+    your screen. Prices and availability may change without notice, and we reserve the right to cancel orders placed
+    with an obvious pricing error.
+  </p>
+
+  <h2>Orders</h2>
+  <p>
+    Your order is an offer to purchase. We accept it once your items ship. If we are unable to fulfil an order, we will
+    let you know and issue a full refund.
+  </p>
+
+  <h2>Returns</h2>
+  <p>
+    Returns are handled according to our <a href="/shipping-returns/">Shipping and Returns policy</a>.
+  </p>
+
+  <h2>Intellectual property</h2>
+  <p>
+    All content on this website, including text, images and logos, belongs to {site.name} or its licensors and may not
+    be used without permission.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions about these terms can be sent to <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+</PolicyLayout>

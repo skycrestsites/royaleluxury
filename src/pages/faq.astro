@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faqs } from '../data/faqs';
+import { breadcrumbSchema, faqSchema } from '../data/schema';
+import { site } from '../data/site';
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'FAQ', href: '/faq/' },
+];
+---
+
+<BaseLayout
+  title="Frequently Asked Questions"
+  description={`Answers to common questions about ${site.name} shipping, returns, sizing and product care.`}
+  jsonLd={[breadcrumbSchema(crumbs), faqSchema(faqs)]}
+>
+  <PageHeader
+    eyebrow="Help Centre"
+    title="Frequently asked <em>questions</em>"
+    lead="Everything you need to know about orders, shipping, returns and caring for your pieces."
+    crumbs={crumbs}
+  />
+
+  <section class="section">
+    <div class="container faq-wrap">
+      <FaqList items={faqs} />
+    </div>
+  </section>
+
+  <CtaBand
+    title="Still have <em>questions</em>?"
+    text="Our team replies within one business day."
+    href="/contact/"
+    label="Contact Us"
+  />
+</BaseLayout>
+
+<style>
+  .faq-wrap {
+    max-width: 56rem;
+  }
+</style>

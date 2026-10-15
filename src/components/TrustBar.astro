@@ -1,0 +1,78 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+import { formatPrice, site } from '../data/site';
+
+const items: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'truck', title: 'Free Shipping', text: `On orders over ${formatPrice(site.freeShippingThreshold).replace('.00', '')}` },
+  { icon: 'returns', title: `${site.returnWindowDays}-Day Returns`, text: 'Simple, no-fuss returns' },
+  { icon: 'shield', title: 'Secure Checkout', text: 'Encrypted, trusted payments' },
+  { icon: 'chat', title: 'Real Support', text: 'Friendly help, every weekday' },
+];
+---
+
+<section class="trust" aria-label="Why shop with us">
+  <ul role="list" class="container trust-list">
+    {
+      items.map((item) => (
+        <li>
+          <Icon name={item.icon} size={26} />
+          <div>
+            <p class="trust-title">{item.title}</p>
+            <p class="trust-text">{item.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .trust {
+    border-block: 1px solid var(--line);
+  }
+
+  .trust-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding-block: 1.75rem;
+  }
+
+  .trust-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .trust-list :global(svg) {
+    flex-shrink: 0;
+    color: var(--champagne-deep);
+  }
+
+  .trust-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .trust-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .trust-list {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem 1rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .trust-list li {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+  }
+</style>

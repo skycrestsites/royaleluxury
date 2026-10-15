@@ -1,0 +1,92 @@
+---
+import ProductCard from './ProductCard.astro';
+import type { Product } from '../data/products';
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+---
+
+<div class="listing" data-listing>
+  <div class="toolbar">
+    <p class="count">{products.length} {products.length === 1 ? 'product' : 'products'}</p>
+    <label class="sort">
+      <span>Sort by</span>
+      <select data-sort>
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+      </select>
+    </label>
+  </div>
+  <div class="grid-products" data-grid>
+    {products.map((product, i) => <ProductCard product={product} eager={i < 4} />)}
+  </div>
+</div>
+
+<style>
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .sort {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  select {
+    min-height: 44px;
+    padding: 0.5rem 2.25rem 0.5rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--white)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23262a33' stroke-width='1.5'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E")
+      no-repeat right 0.85rem center;
+    font-size: 0.85rem;
+    letter-spacing: normal;
+    text-transform: none;
+    appearance: none;
+  }
+
+  @media (max-width: 480px) {
+    .sort span {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-listing]').forEach((listing) => {
+    const grid = listing.querySelector<HTMLElement>('[data-grid]');
+    const select = listing.querySelector<HTMLSelectElement>('[data-sort]');
+    if (!grid || !select) return;
+
+    const original = Array.from(grid.children) as HTMLElement[];
+    const priceOf = (el: HTMLElement) => Number(el.dataset.price ?? 0);
+
+    select.addEventListener('change', () => {
+      const sorted = [...original];
+      if (select.value === 'price-asc') sorted.sort((a, b) => priceOf(a) - priceOf(b));
+      if (select.value === 'price-desc') sorted.sort((a, b) => priceOf(b) - priceOf(a));
+      grid.replaceChildren(...sorted);
+    });
+  });
+</script>

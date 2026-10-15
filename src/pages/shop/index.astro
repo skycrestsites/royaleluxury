@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ProductListing from '../../components/ProductListing.astro';
+import Carousel from '../../components/Carousel.astro';
+import RoomTile from '../../components/RoomTile.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { categories } from '../../data/categories';
+import { products } from '../../data/products';
+import { breadcrumbSchema } from '../../data/schema';
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Shop', href: '/shop/' },
+];
+---
+
+<BaseLayout
+  title="Shop All Home Essentials"
+  description="Shop the full Royale Luxury collection of bedding, kitchenware, bath essentials and home decor. Hotel-inspired quality, sensibly priced."
+  jsonLd={[breadcrumbSchema(crumbs)]}
+>
+  <PageHeader
+    eyebrow="The Collection"
+    title="Shop <em>all</em>"
+    lead="Every Royale Luxury piece in one place, from signature bedding to finishing touches."
+    crumbs={crumbs}
+  />
+
+  <section class="section rooms">
+    <div class="container">
+      <Carousel columns={5} mobileItemWidth="44%" label="Shop by room">
+        {categories.map((category) => <RoomTile category={category} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container">
+      <ProductListing products={products} />
+    </div>
+  </section>
+
+  <CtaBand
+    title="Need help <em>choosing</em>?"
+    text="Our team is happy to help with sizing, materials and styling advice."
+    href="/contact/"
+    label="Contact Us"
+  />
+</BaseLayout>
+
+<style>
+  .rooms {
+    padding-block: clamp(2rem, 4vw, 3rem);
+  }
+
+  .rooms :global(.room-name) {
+    font-size: 1.35rem;
+  }
+
+  .rooms :global(.room-tile) {
+    aspect-ratio: 1 / 1;
+  }
+</style>

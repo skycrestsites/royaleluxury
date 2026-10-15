@@ -1,0 +1,514 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon, { type IconName } from '../components/Icon.astro';
+import Rating from '../components/Rating.astro';
+import TrustBar from '../components/TrustBar.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Carousel from '../components/Carousel.astro';
+import RoomTile from '../components/RoomTile.astro';
+import ProductCard from '../components/ProductCard.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import heroImage from '../assets/images/hero-bedroom.jpg';
+import storyImage from '../assets/images/story-living.jpg';
+import { categories, categoryUrl } from '../data/categories';
+import { getFeaturedProducts, productUrl, products } from '../data/products';
+import { faqs } from '../data/faqs';
+import { formatPrice, site } from '../data/site';
+import { organizationSchema, websiteSchema } from '../data/schema';
+
+const featured = getFeaturedProducts();
+const spotlight = products[0];
+const totalReviews = products.reduce((sum, p) => sum + p.reviewCount, 0);
+const averageRating = products.reduce((sum, p) => sum + p.rating * p.reviewCount, 0) / totalReviews;
+
+const testimonials = products
+  .flatMap((product) => product.reviews.map((review) => ({ review, productName: product.name })))
+  .filter(({ review }) => review.rating === 5)
+  .slice(0, 3);
+
+const reasons: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'gem', title: 'Considered Design', text: 'Every piece is designed in a restrained palette so it works with the home you already have.' },
+  { icon: 'leaf', title: 'Quality Materials', text: 'Long-staple cotton, European linen, stoneware and cast iron chosen to last for years.' },
+  { icon: 'shield', title: 'Honest Pricing', text: 'We work directly with makers, so you get premium quality without the premium markup.' },
+  { icon: 'returns', title: 'Easy Returns', text: `Not quite right? Return it within ${site.returnWindowDays} days for a full refund, no questions asked.` },
+];
+---
+
+<BaseLayout
+  description="Royale Luxury offers hotel-inspired bedding, kitchenware, bath essentials and home decor at sensible prices. Shop by room and enjoy free shipping on orders over $75."
+  jsonLd={[organizationSchema(), websiteSchema()]}
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">{site.tagline}</p>
+        <h1>Elevated essentials for <em>every room</em></h1>
+        <p class="lead">
+          Bedding, kitchenware, bath and decor designed with a hotel-inspired eye and priced for real life. Thoughtful
+          pieces that make home feel calm, considered and completely yours.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href={categoryUrl('bedroom')}>Shop Bedroom</a>
+          <a class="btn btn--outline" href="/shop/">Explore All</a>
+        </div>
+        <div class="hero-proof">
+          <Rating value={Math.round(averageRating * 10) / 10} size={16} showValue />
+          <span>from {totalReviews.toLocaleString('en-US')}+ verified reviews</span>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <Picture
+          src={heroImage}
+          alt="Elegant bedroom with layered neutral bedding and soft lighting"
+          widths={[480, 720, 960, 1200]}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          formats={['avif', 'webp']}
+          loading="eager"
+          fetchpriority="high"
+          class="hero-img"
+        />
+        <a class="hero-card" href={productUrl(spotlight.slug)}>
+          <Picture src={spotlight.images[0].src} alt="" widths={[120]} sizes="60px" formats={['avif', 'webp']} class="hero-card-img" />
+          <span>
+            <span class="hero-card-label">Bestseller</span>
+            <span class="hero-card-name">{spotlight.name}</span>
+            <span class="hero-card-price">{formatPrice(spotlight.price)}</span>
+          </span>
+          <Icon name="arrowRight" size={18} />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <TrustBar />
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Shop by Room" title="Designed for <em>every space</em>" lead="Find pieces made to work beautifully together, room by room.">
+        <a class="link-arrow" href="/shop/">View all products <Icon name="arrowRight" size={14} /></a>
+      </SectionHeading>
+      <Carousel columns={5} mobileItemWidth="68%" label="Shop by room">
+        {categories.map((category) => <RoomTile category={category} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container">
+      <SectionHeading eyebrow="Customer Favourites" title="Our most <em>loved pieces</em>">
+        <a class="link-arrow" href="/shop/">Shop all <Icon name="arrowRight" size={14} /></a>
+      </SectionHeading>
+      <Carousel columns={4} mobileItemWidth="64%" label="Bestselling products">
+        {featured.map((product) => <ProductCard product={product} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <section class="section spotlight-section">
+    <div class="container spotlight">
+      <div class="spotlight-media">
+        <Picture
+          src={spotlight.images[1].src}
+          alt={spotlight.images[1].alt}
+          widths={[480, 720, 960]}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          formats={['avif', 'webp']}
+        />
+      </div>
+      <div class="spotlight-copy">
+        <p class="eyebrow">The Signature Piece</p>
+        <h2>The {spotlight.name.replace(' Set', '')}, <em>perfected</em></h2>
+        <p class="lead">{spotlight.summary}</p>
+        <ul role="list" class="check-list">
+          {
+            spotlight.highlights.map((highlight) => (
+              <li>
+                <Icon name="check" size={18} />
+                {highlight}
+              </li>
+            ))
+          }
+        </ul>
+        <div class="spotlight-price">
+          <span>{formatPrice(spotlight.price)}</span>
+          {spotlight.compareAtPrice && <s class="muted">{formatPrice(spotlight.compareAtPrice)}</s>}
+        </div>
+        <a class="btn btn--gold" href={productUrl(spotlight.slug)}>View Product</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container why">
+      <div class="why-media">
+        <Picture
+          src={storyImage}
+          alt="Bright, calm living room styled with natural textures"
+          widths={[480, 720, 960]}
+          sizes="(max-width: 900px) 100vw, 45vw"
+          formats={['avif', 'webp']}
+        />
+      </div>
+      <div>
+        <SectionHeading
+          eyebrow="Why Royale Luxury"
+          title="Quiet luxury, <em>sensibly priced</em>"
+          lead="We believe a beautiful home should not require a luxury budget. Here is what goes into every piece we make."
+        />
+        <ul role="list" class="reasons">
+          {
+            reasons.map((reason) => (
+              <li>
+                <span class="reason-icon">
+                  <Icon name={reason.icon} size={22} />
+                </span>
+                <h3>{reason.title}</h3>
+                <p>{reason.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section testimonials">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Reviews"
+        title="What our <em>customers</em> say"
+        lead="Don't just take our word for it. Here is what customers are saying about their new favourites."
+        align="center"
+      />
+      <Carousel columns={3} mobileItemWidth="86%" label="Customer reviews">
+        {testimonials.map(({ review, productName }) => <ReviewCard review={review} productName={productName} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container faq-split">
+      <div>
+        <SectionHeading
+          eyebrow="FAQ"
+          title="Answers to our most <em>common questions</em>"
+          lead="Quick, clear answers about shipping, returns and caring for your pieces."
+        />
+        <a class="link-arrow" href="/faq/">View all FAQs <Icon name="arrowRight" size={14} /></a>
+      </div>
+      <FaqList items={faqs.filter((faq) => faq.featured)} />
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container">
+      <SectionHeading eyebrow="About Royale Luxury" title="Beautiful living, <em>sensibly priced</em>" />
+      <div class="about-seo-cols">
+        <div class="prose">
+          <h3>A calmer, more considered home</h3>
+          <p>
+            Life moves quickly, and home should be the place where it slows down. Royale Luxury was created for people
+            who care about how their spaces look and feel, but do not want to pay a luxury markup for quality. We design
+            home essentials that bring the calm of a boutique hotel into everyday rooms.
+          </p>
+          <p>
+            From <a href={categoryUrl('bedroom')}>sateen and linen bedding</a> to{' '}
+            <a href={categoryUrl('kitchen')}>enameled cast iron cookware</a>, every collection is built around natural
+            materials, a restrained colour palette and details that hold up to daily life.
+          </p>
+        </div>
+        <div class="prose">
+          <h3>Designed to work together</h3>
+          <p>
+            Our pieces share a palette of white, ivory, taupe, charcoal and soft champagne, so they mix naturally from
+            room to room. Start with a <a href={productUrl(spotlight.slug)}>signature duvet cover</a>, add{' '}
+            <a href={categoryUrl('living-room')}>textured pillows</a> to the sofa, finish the bath with{' '}
+            <a href={categoryUrl('bathroom')}>spa-inspired essentials</a>, and your home begins to feel cohesive without
+            trying too hard.
+          </p>
+          <p>
+            Every order is backed by free shipping over {formatPrice(site.freeShippingThreshold).replace('.00', '')},{' '}
+            {site.returnWindowDays}-day returns and a support team that actually responds.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(2rem, 5vw, 4.5rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .hero-copy .eyebrow {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-copy .lead {
+    margin-top: 1.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+
+  .hero-proof {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .hero-media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    max-height: 720px;
+    width: 100%;
+    background: var(--surface);
+  }
+
+  .hero-media :global(picture),
+  .hero-media :global(.hero-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-card {
+    position: absolute;
+    left: clamp(-2.5rem, -3vw, -1rem);
+    bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+    background: var(--white);
+    box-shadow: 0 18px 40px rgba(38, 42, 51, 0.12);
+    transition: transform 0.3s var(--ease);
+  }
+
+  .hero-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .hero-card :global(.hero-card-img) {
+    width: 60px;
+    height: 72px;
+    object-fit: cover;
+  }
+
+  .hero-card > span {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .hero-card-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--champagne-deep);
+  }
+
+  .hero-card-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .hero-card-price {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .spotlight-section {
+    background: var(--charcoal);
+    color: var(--white);
+  }
+
+  .spotlight-section .eyebrow,
+  .spotlight-section h2 em,
+  .check-list :global(svg) {
+    color: var(--champagne);
+  }
+
+  .spotlight-section .lead,
+  .spotlight-section .muted {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .spotlight {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+
+  .spotlight-media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .spotlight-media :global(img),
+  .spotlight-media :global(picture) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .spotlight-copy .eyebrow {
+    margin-bottom: 1rem;
+  }
+
+  .spotlight-copy .lead {
+    margin-top: 1.25rem;
+  }
+
+  .check-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-block: 2rem;
+  }
+
+  .check-list li {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .check-list :global(svg) {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .spotlight-price {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .spotlight-price s {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .why {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+
+  .why-media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .why-media :global(img),
+  .why-media :global(picture) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .reasons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.25rem 2rem;
+  }
+
+  .reason-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--champagne);
+    color: var(--champagne-deep);
+  }
+
+  .reasons h3 {
+    margin-bottom: 0.4rem;
+  }
+
+  .reasons p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  .testimonials {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq-split {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  .about-seo-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid,
+    .spotlight,
+    .why,
+    .faq-split,
+    .about-seo-cols {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-media {
+      aspect-ratio: 4 / 4.4;
+    }
+
+    .hero-card {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+    }
+
+    .hero-card > span {
+      flex: 1;
+    }
+
+  }
+
+  @media (max-width: 560px) {
+    .hero-actions .btn {
+      flex: 1 1 100%;
+    }
+
+    .reasons {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+  }
+</style>

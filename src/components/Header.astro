@@ -1,0 +1,396 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import monogram from '../assets/brand/monogram.png';
+import { categories, categoryUrl } from '../data/categories';
+import { formatPrice, site } from '../data/site';
+
+const links = [
+  ...categories.map((category) => ({ label: category.name, href: categoryUrl(category.slug) })),
+  { label: 'About', href: '/about/' },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => path.startsWith(href);
+---
+
+<div class="announcement">
+  <p class="container">
+    Free shipping on orders over {formatPrice(site.freeShippingThreshold).replace('.00', '')}
+    <span aria-hidden="true">&middot;</span>
+    {site.returnWindowDays}-day returns
+  </p>
+</div>
+
+<header class="site-header" data-header>
+  <div class="container header-inner">
+    <button class="icon-btn menu-toggle" type="button" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false" data-menu-open>
+      <Icon name="menu" size={24} />
+    </button>
+
+    <a class="brand" href="/" aria-label={`${site.name} home`}>
+      <Image src={monogram} alt="" width={44} height={43} loading="eager" class="brand-mark" />
+      <span class="brand-text">
+        <span class="brand-name">Royale</span>
+        <span class="brand-sub">Luxury</span>
+      </span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <ul role="list">
+        {
+          links.map((link) => (
+            <li>
+              <a href={link.href} class:list={['nav-link', { 'is-active': isActive(link.href) }]} aria-current={isActive(link.href) ? 'page' : undefined}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn header-cta" href="/shop/">Shop All</a>
+      <a class="icon-btn bag-link" href="/bag/" aria-label="Shopping bag">
+        <Icon name="bag" size={24} />
+        <span class="bag-count" data-bag-count hidden>0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-menu hidden>
+  <div class="mobile-menu-backdrop" data-menu-close></div>
+  <nav class="mobile-menu-panel" aria-label="Mobile">
+    <div class="mobile-menu-head">
+      <span class="brand-text brand-text--light">
+        <span class="brand-name">Royale</span>
+        <span class="brand-sub">Luxury</span>
+      </span>
+      <button class="icon-btn" type="button" aria-label="Close menu" data-menu-close>
+        <Icon name="close" size={24} />
+      </button>
+    </div>
+    <ul role="list" class="mobile-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/shop/">Shop All</a></li>
+      {categories.map((category) => <li><a href={categoryUrl(category.slug)}>{category.name}</a></li>)}
+      <li><a href="/about/">About</a></li>
+      <li><a href="/faq/">FAQ</a></li>
+      <li><a href="/contact/">Contact</a></li>
+    </ul>
+    <a class="btn btn--gold btn--block" href="/shop/">Shop the Collection</a>
+  </nav>
+</div>
+
+<style>
+  .announcement {
+    background: var(--charcoal);
+    color: var(--white);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .announcement p {
+    padding-block: 0.6rem;
+  }
+
+  .announcement span {
+    margin-inline: 0.6rem;
+    color: var(--champagne);
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+
+  .site-header.is-scrolled {
+    border-color: var(--line);
+    box-shadow: 0 6px 24px rgba(38, 42, 51, 0.06);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: var(--header-height);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: auto;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .brand-name {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .brand-sub {
+    margin-top: 0.3rem;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--champagne-deep);
+  }
+
+  .brand-text--light .brand-name {
+    color: var(--white);
+  }
+
+  .brand-text--light .brand-sub {
+    color: var(--champagne);
+  }
+
+  .primary-nav {
+    margin-inline: auto;
+  }
+
+  .primary-nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 2.2vw, 2.25rem);
+  }
+
+  .nav-link {
+    position: relative;
+    display: block;
+    padding-block: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--champagne);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+  }
+
+  .nav-link:hover::after,
+  .nav-link.is-active::after {
+    transform: scaleX(1);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .header-cta {
+    min-height: 2.9rem;
+    padding: 0.7rem 1.5rem;
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .bag-count {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 4px;
+    border-radius: 9px;
+    background: var(--champagne);
+    color: var(--charcoal);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+  }
+
+  .mobile-menu-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(38, 42, 51, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+  }
+
+  .mobile-menu-panel {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: flex;
+    flex-direction: column;
+    width: min(88vw, 380px);
+    padding: 1.25rem 1.5rem 2rem;
+    overflow-y: auto;
+    background: var(--charcoal);
+    color: var(--white);
+    transform: translateX(-100%);
+    transition: transform 0.35s var(--ease);
+  }
+
+  .mobile-menu.is-open .mobile-menu-backdrop {
+    opacity: 1;
+  }
+
+  .mobile-menu.is-open .mobile-menu-panel {
+    transform: none;
+  }
+
+  .mobile-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .mobile-links {
+    flex: 1;
+    margin-bottom: 2rem;
+  }
+
+  .mobile-links a {
+    display: block;
+    padding-block: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .mobile-links a:hover {
+    color: var(--champagne);
+  }
+
+  @media (max-width: 1080px) {
+    .primary-nav,
+    .header-cta {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: inline-grid;
+      margin-left: -10px;
+    }
+
+    .header-inner {
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      margin-right: -10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .brand-mark {
+      width: 36px;
+    }
+
+    .brand-name {
+      font-size: 1.3rem;
+    }
+
+    .brand-sub {
+      font-size: 0.55rem;
+    }
+
+    .announcement {
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+    }
+  }
+</style>
+
+<script>
+  import { readBag, bagCount, BAG_EVENT } from '../scripts/bag';
+
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const openButton = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+
+  const setMenu = (open: boolean) => {
+    if (!menu || !openButton) return;
+    openButton.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('is-locked', open);
+    if (open) {
+      menu.hidden = false;
+      requestAnimationFrame(() => menu.classList.add('is-open'));
+      menu.querySelector<HTMLElement>('[data-menu-close].icon-btn')?.focus();
+    } else {
+      menu.classList.remove('is-open');
+      window.setTimeout(() => (menu.hidden = true), 350);
+      openButton.focus();
+    }
+  };
+
+  openButton?.addEventListener('click', () => setMenu(true));
+  menu?.querySelectorAll('[data-menu-close]').forEach((el) => el.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu && !menu.hidden) setMenu(false);
+  });
+
+  const countEl = document.querySelector<HTMLElement>('[data-bag-count]');
+  const renderCount = () => {
+    if (!countEl) return;
+    const count = bagCount(readBag());
+    countEl.textContent = String(count);
+    countEl.hidden = count === 0;
+  };
+  renderCount();
+  window.addEventListener(BAG_EVENT, renderCount);
+  window.addEventListener('storage', renderCount);
+</script>

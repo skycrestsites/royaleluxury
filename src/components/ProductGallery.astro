@@ -1,0 +1,231 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { ProductImage } from '../data/products';
+
+interface Props {
+  images: ProductImage[];
+}
+
+const { images } = Astro.props;
+const multiple = images.length > 1;
+---
+
+<div class="gallery" data-gallery>
+  <div class="gallery-stage">
+    <div class="gallery-track" data-gallery-track aria-label="Product images" role="region" tabindex="0">
+      {
+        images.map((image, i) => (
+          <figure class="gallery-slide" aria-label={`Image ${i + 1} of ${images.length}`}>
+            <Picture
+              src={image.src}
+              alt={image.alt}
+              widths={[480, 720, 960, 1280]}
+              sizes="(max-width: 900px) 100vw, 55vw"
+              formats={['avif', 'webp']}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchpriority={i === 0 ? 'high' : undefined}
+            />
+          </figure>
+        ))
+      }
+    </div>
+
+    {
+      multiple && (
+        <>
+          <button class="gallery-arrow gallery-arrow--prev" type="button" aria-label="Previous image" data-gallery-prev>
+            <Icon name="chevronLeft" size={20} />
+          </button>
+          <button class="gallery-arrow gallery-arrow--next" type="button" aria-label="Next image" data-gallery-next>
+            <Icon name="chevronRight" size={20} />
+          </button>
+          <p class="gallery-counter" aria-hidden="true">
+            <span data-gallery-current>1</span> / {images.length}
+          </p>
+        </>
+      )
+    }
+  </div>
+
+  {
+    multiple && (
+      <div class="gallery-thumbs" role="group" aria-label="Choose an image">
+        {images.map((image, i) => (
+          <button
+            class="gallery-thumb"
+            type="button"
+            aria-label={`Show image ${i + 1}`}
+            aria-current={i === 0 ? 'true' : 'false'}
+            data-gallery-thumb={i}
+          >
+            <Picture src={image.src} alt="" widths={[160]} sizes="80px" formats={['avif', 'webp']} />
+          </button>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .gallery-stage {
+    position: relative;
+  }
+
+  .gallery-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    background: var(--surface);
+  }
+
+  .gallery-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-slide {
+    flex: 0 0 100%;
+    aspect-ratio: 4 / 5;
+    scroll-snap-align: start;
+  }
+
+  .gallery-slide :global(picture),
+  .gallery-slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-arrow {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-50%);
+    transition: background-color 0.2s var(--ease), opacity 0.2s var(--ease);
+  }
+
+  .gallery-arrow:hover {
+    background: var(--white);
+  }
+
+  .gallery-arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gallery-arrow--prev {
+    left: 1rem;
+  }
+
+  .gallery-arrow--next {
+    right: 1rem;
+  }
+
+  .gallery-counter {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.25rem 0.7rem;
+    background: rgba(255, 255, 255, 0.92);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .gallery-thumbs {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .gallery-thumb {
+    flex: 0 0 84px;
+    aspect-ratio: 4 / 5;
+    padding: 0;
+    border: 1px solid transparent;
+    background: var(--surface);
+    opacity: 0.6;
+    transition: opacity 0.2s var(--ease), border-color 0.2s var(--ease);
+  }
+
+  .gallery-thumb :global(picture),
+  .gallery-thumb :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gallery-thumb:hover,
+  .gallery-thumb[aria-current='true'] {
+    opacity: 1;
+  }
+
+  .gallery-thumb[aria-current='true'] {
+    border-color: var(--charcoal);
+  }
+
+  @media (max-width: 900px) {
+    .gallery {
+      margin-inline: calc(var(--pad) * -1);
+    }
+
+    .gallery-arrow {
+      display: none;
+    }
+
+    .gallery-thumbs {
+      padding-inline: var(--pad);
+    }
+
+    .gallery-thumb {
+      flex-basis: 64px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const track = gallery.querySelector<HTMLElement>('[data-gallery-track]');
+    if (!track) return;
+
+    const slides = Array.from(track.children) as HTMLElement[];
+    const thumbs = Array.from(gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]'));
+    const prev = gallery.querySelector<HTMLButtonElement>('[data-gallery-prev]');
+    const next = gallery.querySelector<HTMLButtonElement>('[data-gallery-next]');
+    const current = gallery.querySelector<HTMLElement>('[data-gallery-current]');
+    let index = 0;
+
+    const goTo = (i: number) => {
+      const target = Math.max(0, Math.min(slides.length - 1, i));
+      track.scrollTo({ left: target * track.clientWidth, behavior: 'smooth' });
+    };
+
+    const sync = () => {
+      index = Math.round(track.scrollLeft / track.clientWidth);
+      thumbs.forEach((thumb, i) => thumb.setAttribute('aria-current', String(i === index)));
+      if (current) current.textContent = String(index + 1);
+      if (prev) prev.disabled = index === 0;
+      if (next) next.disabled = index === slides.length - 1;
+    };
+
+    thumbs.forEach((thumb, i) => thumb.addEventListener('click', () => goTo(i)));
+    prev?.addEventListener('click', () => goTo(index - 1));
+    next?.addEventListener('click', () => goTo(index + 1));
+    track.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') goTo(index - 1);
+      if (event.key === 'ArrowRight') goTo(index + 1);
+    });
+    track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+    sync();
+  });
+</script>

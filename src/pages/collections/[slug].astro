@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ProductListing from '../../components/ProductListing.astro';
+import Carousel from '../../components/Carousel.astro';
+import RoomTile from '../../components/RoomTile.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { categories, categoryUrl, type Category } from '../../data/categories';
+import { getProductsByCategory } from '../../data/products';
+import { breadcrumbSchema } from '../../data/schema';
+
+export function getStaticPaths() {
+  return categories.map((category) => ({ params: { slug: category.slug }, props: { category } }));
+}
+
+interface Props {
+  category: Category;
+}
+
+const { category } = Astro.props;
+const products = getProductsByCategory(category.slug);
+const otherRooms = categories.filter((c) => c.slug !== category.slug);
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Shop', href: '/shop/' },
+  { name: category.name, href: categoryUrl(category.slug) },
+];
+---
+
+<BaseLayout
+  title={`${category.name} Essentials`}
+  description={category.metaDescription}
+  image={category.image.src}
+  imageAlt={category.imageAlt}
+  jsonLd={[breadcrumbSchema(crumbs)]}
+>
+  <PageHeader
+    eyebrow={category.name}
+    title={category.headline}
+    lead={category.summary}
+    crumbs={crumbs}
+    image={category.image}
+    imageAlt={category.imageAlt}
+  />
+
+  <section class="section">
+    <div class="container">
+      <ProductListing products={products} />
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container collection-intro">
+      <h2>Shop {category.name.toLowerCase()} <em>with confidence</em></h2>
+      <div class="prose">
+        {category.intro.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--flush-top">
+    <div class="container">
+      <SectionHeading eyebrow="Keep Exploring" title="Shop other <em>rooms</em>" />
+      <Carousel columns={4} mobileItemWidth="64%" label="Other rooms">
+        {otherRooms.map((room) => <RoomTile category={room} />)}
+      </Carousel>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .collection-intro {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  @media (max-width: 900px) {
+    .collection-intro {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

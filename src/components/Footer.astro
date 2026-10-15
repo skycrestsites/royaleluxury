@@ -1,0 +1,250 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import monogram from '../assets/brand/monogram.png';
+import { categories, categoryUrl } from '../data/categories';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+
+const columns = [
+  {
+    title: 'Shop',
+    links: [{ label: 'Shop All', href: '/shop/' }, ...categories.map((c) => ({ label: c.name, href: categoryUrl(c.slug) }))],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', href: '/about/' },
+      { label: 'Contact', href: '/contact/' },
+      { label: 'FAQ', href: '/faq/' },
+    ],
+  },
+  {
+    title: 'Support',
+    links: [
+      { label: 'Shipping and Returns', href: '/shipping-returns/' },
+      { label: 'Privacy Policy', href: '/privacy-policy/' },
+      { label: 'Terms of Service', href: '/terms/' },
+    ],
+  },
+];
+
+const socials = [
+  { label: 'Instagram', href: site.social.instagram, icon: 'instagram' },
+  { label: 'TikTok', href: site.social.tiktok, icon: 'tiktok' },
+  { label: 'Pinterest', href: site.social.pinterest, icon: 'pinterest' },
+] as const;
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="footer-logo" href="/" aria-label={`${site.name} home`}>
+        <Image src={monogram} alt="" width={52} height={51} />
+        <span>
+          <span class="footer-name">Royale</span>
+          <span class="footer-sub">Luxury</span>
+        </span>
+      </a>
+      <p>{site.description}</p>
+      <ul class="socials" role="list">
+        {
+          socials.map((social) => (
+            <li>
+              <a href={social.href} target="_blank" rel="noopener" aria-label={`${site.name} on ${social.label}`}>
+                <Icon name={social.icon} size={18} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {
+      columns.map((column) => (
+        <div class="footer-col">
+          <h2 class="footer-title">{column.title}</h2>
+          <ul role="list">
+            {column.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+
+    <div class="footer-col">
+      <h2 class="footer-title">Get in Touch</h2>
+      <ul role="list" class="contact-list">
+        <li>
+          <Icon name="mail" size={18} />
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+        </li>
+        <li>
+          <Icon name="clock" size={18} />
+          <span>
+            {
+              site.hours.map((entry) => (
+                <span class="hours">
+                  {entry.days}: {entry.time}
+                </span>
+              ))
+            }
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>&copy; {year} {site.name}. All rights reserved.</p>
+    <p>{site.tagline}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--charcoal);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.9rem;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.6fr repeat(3, 1fr) 1.3fr;
+    gap: 3rem 2rem;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  }
+
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .footer-logo > span {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .footer-name {
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .footer-sub {
+    margin-top: 0.3rem;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--champagne);
+  }
+
+  .footer-brand p {
+    max-width: 22rem;
+  }
+
+  .socials {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--white);
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+
+  .socials a:hover {
+    border-color: var(--champagne);
+    color: var(--champagne);
+  }
+
+  .footer-title {
+    margin-bottom: 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--champagne);
+  }
+
+  .footer-col li + li {
+    margin-top: 0.75rem;
+  }
+
+  .footer-col a {
+    transition: color 0.2s var(--ease);
+  }
+
+  .footer-col a:hover {
+    color: var(--white);
+  }
+
+  .contact-list li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .contact-list :global(svg) {
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+    color: var(--champagne);
+  }
+
+  .hours {
+    display: block;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 1.5rem;
+    }
+
+    .footer-col:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>

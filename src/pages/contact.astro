@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import FaqList from '../components/FaqList.astro';
+import { faqs } from '../data/faqs';
+import { breadcrumbSchema } from '../data/schema';
+import { site } from '../data/site';
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Contact', href: '/contact/' },
+];
+---
+
+<BaseLayout
+  title="Contact Us"
+  description={`Get in touch with ${site.name}. Our team can help with orders, sizing, materials and styling advice.`}
+  jsonLd={[breadcrumbSchema(crumbs)]}
+>
+  <PageHeader
+    eyebrow="Customer Care"
+    title="We are here <em>to help</em>"
+    lead="Questions about an order, sizing or materials? Reach out and a member of our team will reply within one business day."
+    crumbs={crumbs}
+  />
+
+  <section class="section">
+    <div class="container contact">
+      <div class="contact-cards">
+        <a class="contact-card" href={`mailto:${site.email}`}>
+          <Icon name="mail" size={26} />
+          <h2>Email us</h2>
+          <p>{site.email}</p>
+          <span class="link-arrow">Send an email <Icon name="arrowRight" size={14} /></span>
+        </a>
+        <div class="contact-card">
+          <Icon name="clock" size={26} />
+          <h2>Support hours</h2>
+          {
+            site.hours.map((entry) => (
+              <p>
+                {entry.days}: {entry.time} ET
+              </p>
+            ))
+          }
+        </div>
+        <a class="contact-card" href="/shipping-returns/">
+          <Icon name="returns" size={26} />
+          <h2>Shipping and returns</h2>
+          <p>Free shipping over ${site.freeShippingThreshold}, {site.returnWindowDays}-day returns.</p>
+          <span class="link-arrow">Read the policy <Icon name="arrowRight" size={14} /></span>
+        </a>
+      </div>
+
+      <div class="contact-faq">
+        <h2>Common <em>questions</em></h2>
+        <FaqList items={faqs.slice(0, 4)} />
+        <a class="link-arrow" href="/faq/">View all FAQs <Icon name="arrowRight" size={14} /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--section);
+  }
+
+  .contact-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+  }
+
+  .contact-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+    border: 1px solid var(--line);
+    transition: border-color 0.25s var(--ease);
+  }
+
+  a.contact-card:hover {
+    border-color: var(--champagne);
+  }
+
+  .contact-card :global(svg:first-child) {
+    margin-bottom: 0.5rem;
+    color: var(--champagne-deep);
+  }
+
+  .contact-card h2 {
+    font-family: var(--font-sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .contact-card p {
+    color: var(--text-muted);
+  }
+
+  .contact-card .link-arrow {
+    margin-top: auto;
+    padding-top: 0.75rem;
+  }
+
+  .contact-faq {
+    display: grid;
+    gap: 2rem;
+    justify-items: start;
+    max-width: 52rem;
+  }
+
+  .contact-faq :global(.faq-list) {
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .contact-cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

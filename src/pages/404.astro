@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Carousel from '../components/Carousel.astro';
+import RoomTile from '../components/RoomTile.astro';
+import { categories } from '../data/categories';
+---
+
+<BaseLayout title="Page Not Found" description="The page you are looking for could not be found." noindex>
+  <section class="section">
+    <div class="container not-found">
+      <p class="eyebrow">Error 404</p>
+      <h1>This page has <em>moved on</em></h1>
+      <p class="lead">The page you are looking for does not exist or may have been moved. Try one of our rooms below.</p>
+      <div class="actions">
+        <a class="btn" href="/">Back to Home</a>
+        <a class="btn btn--outline" href="/shop/">Shop All</a>
+      </div>
+    </div>
+  </section>
+  <section class="section section--flush-top">
+    <div class="container">
+      <Carousel columns={5} mobileItemWidth="68%" label="Shop by room">
+        {categories.map((category) => <RoomTile category={category} />)}
+      </Carousel>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .not-found .eyebrow::before {
+    display: none;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+</style>

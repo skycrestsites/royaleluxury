@@ -1,0 +1,262 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { formatPrice, site } from '../data/site';
+
+const crumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Bag', href: '/bag/' },
+];
+---
+
+<BaseLayout title="Your Bag" description="Review the items in your Royale Luxury shopping bag." noindex>
+  <PageHeader title="Your <em>bag</em>" crumbs={crumbs} />
+
+  <section class="section">
+    <div class="container bag" data-bag data-threshold={site.freeShippingThreshold} data-currency={site.currency}>
+      <div class="bag-empty" data-bag-empty hidden>
+        <p class="lead">Your bag is empty. Discover pieces made to bring calm and comfort to every room.</p>
+        <a class="btn" href="/shop/">Start Shopping</a>
+      </div>
+
+      <div class="bag-content" data-bag-content hidden>
+        <ul role="list" class="bag-items" data-bag-items></ul>
+
+        <aside class="bag-summary" aria-label="Order summary">
+          <h2>Order summary</h2>
+          <dl>
+            <div>
+              <dt>Subtotal</dt>
+              <dd data-bag-subtotal>{formatPrice(0)}</dd>
+            </div>
+            <div>
+              <dt>Shipping</dt>
+              <dd data-bag-shipping>Calculated at checkout</dd>
+            </div>
+          </dl>
+          <p class="shipping-note" data-bag-note></p>
+          <button class="btn btn--block" type="button" disabled>Checkout</button>
+          <p class="checkout-note">Secure online checkout is coming soon.</p>
+          <a class="link-arrow" href="/shop/">Continue shopping</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <template id="bag-item-template">
+  <li class="bag-item">
+    <a class="bag-thumb" data-link><img alt="" width="100" height="125" data-image /></a>
+    <div class="bag-item-body">
+      <a class="bag-name" data-link data-name></a>
+      <p class="bag-variant" data-variant></p>
+      <div class="bag-item-row">
+        <div class="qty" role="group" aria-label="Quantity">
+          <button type="button" aria-label="Decrease quantity" data-step="-1">&minus;</button>
+          <span data-qty></span>
+          <button type="button" aria-label="Increase quantity" data-step="1">+</button>
+        </div>
+        <button class="bag-remove" type="button" data-remove>Remove</button>
+      </div>
+    </div>
+    <p class="bag-line-price" data-line-price></p>
+  </li>
+  </template>
+</BaseLayout>
+
+<style>
+  .bag-content {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+
+  .bag-empty {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
+  .bag-items {
+    border-top: 1px solid var(--line);
+  }
+
+  .bag-items :global(.bag-item) {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    gap: 1.25rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bag-items :global(.bag-thumb img) {
+    width: 100px;
+    height: 125px;
+    object-fit: cover;
+    background: var(--surface);
+  }
+
+  .bag-items :global(.bag-name) {
+    font-weight: 600;
+  }
+
+  .bag-items :global(.bag-variant) {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .bag-items :global(.bag-item-row) {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .bag-items :global(.qty) {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--line);
+  }
+
+  .bag-items :global(.qty button) {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: none;
+    font-size: 1.1rem;
+  }
+
+  .bag-items :global(.qty span) {
+    min-width: 2rem;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .bag-items :global(.bag-remove) {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .bag-items :global(.bag-line-price) {
+    font-weight: 600;
+  }
+
+  .bag-summary {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+    display: grid;
+    gap: 1.25rem;
+    padding: 2rem;
+    border: 1px solid var(--line);
+  }
+
+  .bag-summary h2 {
+    font-size: 1.9rem;
+  }
+
+  .bag-summary dl div {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bag-summary dd {
+    font-weight: 600;
+  }
+
+  .shipping-note,
+  .checkout-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .checkout-note {
+    margin-top: -0.5rem;
+    text-align: center;
+  }
+
+  .bag-summary .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .bag-summary .link-arrow {
+    justify-self: center;
+  }
+
+  @media (max-width: 900px) {
+    .bag-content {
+      grid-template-columns: 1fr;
+    }
+
+    .bag-summary {
+      position: static;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .bag-items :global(.bag-item) {
+      grid-template-columns: 72px 1fr auto;
+      gap: 1rem;
+    }
+
+    .bag-items :global(.bag-thumb img) {
+      width: 72px;
+      height: 90px;
+    }
+  }
+</style>
+
+<script>
+  import { BAG_EVENT, bagSubtotal, readBag, updateQuantity } from '../scripts/bag';
+
+  const root = document.querySelector<HTMLElement>('[data-bag]')!;
+  const list = root.querySelector<HTMLElement>('[data-bag-items]')!;
+  const template = document.querySelector<HTMLTemplateElement>('#bag-item-template')!;
+  const threshold = Number(root.dataset.threshold);
+  const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: root.dataset.currency });
+
+  const render = () => {
+    const items = readBag();
+    root.querySelector<HTMLElement>('[data-bag-empty]')!.hidden = items.length > 0;
+    root.querySelector<HTMLElement>('[data-bag-content]')!.hidden = items.length === 0;
+
+    list.replaceChildren(
+      ...items.map((item) => {
+        const node = template.content.firstElementChild!.cloneNode(true) as HTMLElement;
+        const href = `/products/${item.slug}/`;
+        node.querySelectorAll<HTMLAnchorElement>('[data-link]').forEach((a) => (a.href = href));
+        node.querySelector<HTMLImageElement>('[data-image]')!.src = item.image;
+        node.querySelector<HTMLElement>('[data-name]')!.textContent = item.name;
+        node.querySelector<HTMLElement>('[data-variant]')!.textContent = [item.color, item.size].filter(Boolean).join(' / ');
+        node.querySelector<HTMLElement>('[data-qty]')!.textContent = String(item.quantity);
+        node.querySelector<HTMLElement>('[data-line-price]')!.textContent = money.format(item.price * item.quantity);
+        node.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((button) =>
+          button.addEventListener('click', () =>
+            updateQuantity(item.id, Math.min(10, item.quantity + Number(button.dataset.step))),
+          ),
+        );
+        node.querySelector('[data-remove]')!.addEventListener('click', () => updateQuantity(item.id, 0));
+        return node;
+      }),
+    );
+
+    const subtotal = bagSubtotal(items);
+    root.querySelector<HTMLElement>('[data-bag-subtotal]')!.textContent = money.format(subtotal);
+    root.querySelector<HTMLElement>('[data-bag-shipping]')!.textContent = subtotal >= threshold ? 'Free' : 'Calculated at checkout';
+    root.querySelector<HTMLElement>('[data-bag-note]')!.textContent =
+      subtotal >= threshold
+        ? 'Your order qualifies for free shipping.'
+        : `Add ${money.format(threshold - subtotal)} more for free shipping.`;
+  };
+
+  render();
+  window.addEventListener(BAG_EVENT, render);
+</script>

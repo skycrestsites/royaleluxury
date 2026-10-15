@@ -1,0 +1,14 @@
+{
+  "name": "Royale Luxury",
+  "short_name": "Royale Luxury",
+  "description": "Beautiful living, sensibly priced. Bedding, kitchen, bath and decor for every room.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#262a33",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  value: number;
+  count?: number;
+  size?: number;
+  showValue?: boolean;
+}
+
+const { value, count, size = 14, showValue = false } = Astro.props;
+const filled = Math.round(value);
+const label = `Rated ${value} out of 5${count ? ` from ${count} reviews` : ''}`;
+---
+
+<span class="rating" role="img" aria-label={label}>
+  <span class="stars" aria-hidden="true">
+    {Array.from({ length: 5 }, (_, i) => <Icon name="star" size={size} filled={i < filled} class={i < filled ? 'on' : 'off'} />)}
+  </span>
+  {showValue && <span class="value" aria-hidden="true">{value.toFixed(1)}</span>}
+  {count !== undefined && <span class="count" aria-hidden="true">({count})</span>}
+</span>
+
+<style>
+  .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .stars {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  .stars :global(.on) {
+    color: var(--champagne);
+  }
+
+  .stars :global(.off) {
+    color: var(--line);
+  }
+
+  .value {
+    font-weight: 600;
+    color: var(--text);
+  }
+</style>

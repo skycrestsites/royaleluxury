@@ -1,0 +1,48 @@
+---
+import { site } from '../data/site';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'product' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = site.description,
+  image = '/og-image.jpg',
+  imageAlt = `${site.name} logo`,
+  type = 'website',
+  noindex = false,
+  jsonLd = [],
+} = Astro.props;
+
+const fullTitle = title ? `${title} | ${site.name}` : `${site.name} | ${site.tagline.replace(/\.$/, '')}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const imageUrl = new URL(image, Astro.site).href;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
+
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:alt" content={imageAlt} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
